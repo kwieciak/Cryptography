@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class AES implements Cipher {
 
-    private int nb;                         //Number of columns (32 bit word)
+    private final int nb;                         //Number of columns (32 bit word)
     private int nk;                         //Number of 32 bit words
     private int nr;                         //Number of rounds in encipher
     private byte[] key;                     //One-dimensional array which contains key
@@ -69,10 +69,28 @@ public class AES implements Cipher {
         return tmp;
     }
 
-    /* !!!To be implemented!!! */
     @Override
-    public byte[] decipher() {
-        return new byte[0];
+    public byte[] decipher(byte[] data) {
+        byte[][] state = oneDimensionalArrayConversion(data, (int)Math.sqrt(data.length), (int)Math.sqrt(data.length));
+        byte [] tmp = new byte[data.length];
+        state = addRoundKey(state, nr);
+        state = invShiftRows(state);
+        state = invSubBytes(state);
+
+        for (int round = nr - 1; round > 0; round--)
+        {
+            state = addRoundKey(state, round);
+            state = invMixColumns(state);
+            state = invShiftRows(state);
+            state = invSubBytes(state);
+        }
+
+        state = addRoundKey(state, 0);
+        for (int i = 0; i < tmp.length; i++) {
+            tmp[i] = state[i % 4][i / 4];
+        }
+        return tmp;
+
     }
 
     /* Four main methods used in encipher method */
@@ -135,12 +153,55 @@ public class AES implements Cipher {
         return  modifiedTable;
     }
 
-    /* !!! Four main methods for decipher method (to be implemented) !!! */
+    /* Three main methods for decipher method */
 
-//    public byte[] invSubBytes() {}
-//    public byte[] invShiftRows() {}
-//    public byte[] invMixColumns() {}
-//    public byte[] invAddRoundKey() {}
+    public byte[][] invSubBytes(byte[][] data) {
+        byte [][] modifiedTable = new byte[nb][nb];
+        for (int i = 0; i < nb; i++) {
+            for (int j = 0; j < nb; j++) {
+                modifiedTable[j][i] = invSubstitutedByte(data[j][i]);
+            }
+        }
+        return modifiedTable;
+    }
+    public byte[][] invShiftRows(byte[][] data) {
+        byte [][] modifiedTable = new byte[nb][nb];
+        for (int i = 0; i < nb; i++) {
+            for (int j = 0; j < nb; j++) {
+                if (i == 0) {
+                    modifiedTable[i][j] = data[i][j];
+                } else {
+                    int columnIndex = j - i;
+                    if (columnIndex < 0) {
+                        columnIndex = nb + columnIndex;
+                    }
+                    modifiedTable[i][j] = data[i][columnIndex];
+                }
+            }
+        }
+        return modifiedTable;
+    }
+    public byte[][] invMixColumns(byte[][] data) {
+        byte[][] state = new byte[nb][nb];
+        int[] column = new int[nb];
+        byte b02 = (byte)0x0e, b03 = (byte)0x0b, b04 = (byte)0x0d, b05 = (byte)0x09;
+        for (int i = 0; i < nb; i++)
+        {
+            column[0] = finiteFieldMultiplication(b02, data[0][i]) ^ finiteFieldMultiplication(b03, data[1][i])
+                    ^ finiteFieldMultiplication(b04, data[2][i])  ^ finiteFieldMultiplication(b05, data[3][i]);
+            column[1] = finiteFieldMultiplication(b05, data[0][i]) ^ finiteFieldMultiplication(b02, data[1][i])
+                    ^ finiteFieldMultiplication(b03, data[2][i])  ^ finiteFieldMultiplication(b04, data[3][i]);
+            column[2] = finiteFieldMultiplication(b04, data[0][i]) ^ finiteFieldMultiplication(b05, data[1][i])
+                    ^ finiteFieldMultiplication(b02, data[2][i])  ^ finiteFieldMultiplication(b03, data[3][i]);
+            column[3] = finiteFieldMultiplication(b03, data[0][i]) ^ finiteFieldMultiplication(b04, data[1][i])
+                    ^ finiteFieldMultiplication(b05, data[2][i])  ^ finiteFieldMultiplication(b02, data[3][i]);
+            for (int j = 0; j < 4; j++) {
+                state[j][i] = (byte) (column[j]);
+            }
+        }
+        return state;
+    }
+
 
 
     /* Key expansion method */
@@ -236,6 +297,12 @@ public class AES implements Cipher {
         return (byte) sBox[higherBits][lowerBits];
     }
 
+    private byte invSubstitutedByte(byte b) {
+        byte higherBits = (byte) ((byte) (b >> 4) & 0x0f);
+        byte lowerBits = (byte) (b & 0x0f);
+        return (byte) invSBox[higherBits][lowerBits];
+    }
+
     private byte finiteFieldMultiplication(byte a, byte b) {
         byte p = 0;
 
@@ -265,8 +332,8 @@ public class AES implements Cipher {
 
     public byte[] rotWord(byte[] word) {
         byte[] modifiedWord = new byte[nb];
-        for (int i = 0; i < nb - 1; i++) {
-            modifiedWord[i] = word[i + 1];
+        if (nb - 1 >= 0) {
+            System.arraycopy(word, 1, modifiedWord, 0, nb - 1);
         }
         modifiedWord[nb - 1] = word[0];
 
