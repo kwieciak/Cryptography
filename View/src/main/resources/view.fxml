@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="616.0" prefWidth="910.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField layoutX="71.0" layoutY="73.0" prefHeight="25.0" prefWidth="400.0" />
+      <Button layoutX="502.0" layoutY="73.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="119.0" text="Wprowadź klucz" />
+      <Button layoutX="650.0" layoutY="73.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="144.0" text="Generuj losowy klucz" />
+      <TextField layoutX="207.0" layoutY="174.0" prefHeight="25.0" prefWidth="144.0" />
+      <Text layoutX="71.0" layoutY="191.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Wczytaj klucz z pliku" wrappingWidth="144.0" />
+      <Button layoutX="368.0" layoutY="174.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Wczytaj" />
+      <Text layoutX="485.0" layoutY="191.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zapisz klucz do pliku" wrappingWidth="110.0" />
+      <TextField layoutX="608.0" layoutY="174.0" prefHeight="25.0" prefWidth="144.0" />
+      <Button layoutX="784.0" layoutY="174.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Zapisz" />
+      <Text layoutX="121.0" layoutY="303.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Otwórz tekst jawny" wrappingWidth="173.0" />
+      <Text layoutX="583.0" layoutY="303.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Otwórz szyfrogram" wrappingWidth="194.0" />
+      <TextArea layoutX="79.0" layoutY="340.0" prefHeight="200.0" prefWidth="230.0" />
+      <TextArea layoutX="571.0" layoutY="340.0" prefHeight="200.0" prefWidth="230.0" />
+      <Button layoutX="393.0" layoutY="363.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="110.0" text="Szyfruj" />
+      <Button layoutX="393.0" layoutY="428.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="110.0" text="Deszyfruj" />
+   </children>
+</AnchorPane>
