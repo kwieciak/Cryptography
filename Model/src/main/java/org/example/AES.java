@@ -10,7 +10,6 @@ public class AES implements Cipher {
     private int nr;                         //Number of rounds in encipher
     private byte[] key;                     //One-dimensional array which contains key
 
-
     /* Constructor of class AES takes keyLength in bits and sets other variables according to the specification */
 
     public AES(int keyLength) {
@@ -52,6 +51,8 @@ public class AES implements Cipher {
         byte[][] state = oneDimensionalArrayConversion(data, (int)Math.sqrt(data.length), (int)Math.sqrt(data.length));
         byte [] tmp = new byte[data.length];
         state = addRoundKey(state, 0);
+
+
         for (int round = 1; round < nr; round++)
         {
             state = subBytes(state);
@@ -67,6 +68,33 @@ public class AES implements Cipher {
             tmp[i] = state[i % 4][i / 4];
         }
         return tmp;
+    }
+
+    public byte[] encode (byte [] data){
+        int full16BytesBlocks = data.length / 16;
+        if(data.length % 16 !=0 ){
+            full16BytesBlocks++;
+        }
+        if (full16BytesBlocks == 0){
+            full16BytesBlocks++;
+        }
+
+        int len = full16BytesBlocks * 16;
+        byte[] result = new byte[len];
+        byte[] temp = new byte [len];
+        byte[] blok = new byte [16];
+
+        for(int i=0;i<len;i++){
+            if(i<data.length) temp[i] = data[i];
+            else temp[i] = 0;
+        }
+        for (int k=0;k<temp.length;){
+            for(int j=0;j<16;j++) blok[j] = temp[k++];
+            blok = encipher(blok);
+            System.arraycopy(blok,0,result,k-16,blok.length);
+        }
+        return result;
+
     }
 
     @Override
@@ -93,11 +121,32 @@ public class AES implements Cipher {
 
     }
 
+    public byte[] decode(byte[] data){
+        byte[] tmpResult = new byte[data.length];
+        byte[] blok = new byte[16];
+
+        for(int i=0; i<data.length;){
+            for(int j=0; j<16;j++) blok[j] = data[i++];
+            blok = decipher(blok);
+            System.arraycopy(blok,0,tmpResult,i-16,blok.length);
+        }
+        int cnt = 0;
+        for(int i=1;i<17;i+=2){
+            if(tmpResult[tmpResult.length - i] == 0 && tmpResult[tmpResult.length - i - 1] == 0)
+                cnt += 2;
+            else break;
+        }
+        byte[] result = new byte[tmpResult.length - cnt];
+        System.arraycopy(tmpResult,0,result,0,tmpResult.length - cnt);
+        return result;
+    }
+
     /* Four main methods used in encipher method */
     public byte[][] subBytes(byte[][] data) {
         byte [][] modifiedTable = new byte[nb][nb];
         for (int i = 0; i < nb; i++) {
             for (int j = 0; j < nb; j++) {
+                //do modified table przypisywane sa odpowiednie wartosci, ktore w oryginalnej tablicy zastepowane bylyby odpowiednimi wartosciami z tabeli SBOX
                 modifiedTable[j][i] = substitutedByte(data[j][i]);
             }
         }
@@ -105,6 +154,7 @@ public class AES implements Cipher {
     }
 
     public byte[][] shiftRows(byte [][] data) {
+        //przesuwanie bajtow w lewo: w 2 rzedzie o jeden, w 3 o dwa, w 4 o trzy
         byte [][] modifiedTable = new byte[nb][nb];
         for (int i = 0; i < nb; i++) {
             for (int j = 0; j < nb; j++) {
@@ -122,19 +172,20 @@ public class AES implements Cipher {
         return modifiedTable;
     }
     public byte[][] mixColumns(byte[][] data) {
+        //przemnozenie wszytskich kolumn macierzy przez stala macierz
         byte[][] state = new byte[nb][nb];
         int[] column = new int[nb];
         byte b02 = (byte)0x02, b03 = (byte)0x03;
         for (int i = 0; i < nb; i++)
         {
             column[0] = ((finiteFieldMultiplication(b02, data[0][i]) ^ finiteFieldMultiplication(b03, data[1][i]))
-                                ^ (data[2][i]  ^ data[3][i]));
+                    ^ (data[2][i]  ^ data[3][i]));
             column[1] = (data[0][i]  ^ finiteFieldMultiplication(b02, data[1][i])
-                                ^ finiteFieldMultiplication(b03, data[2][i]) ^ data[3][i]);
+                    ^ finiteFieldMultiplication(b03, data[2][i]) ^ data[3][i]);
             column[2] = (data[0][i]  ^ data[1][i]
-                                ^ finiteFieldMultiplication(b02, data[2][i]) ^ finiteFieldMultiplication(b03, data[3][i]));
+                    ^ finiteFieldMultiplication(b02, data[2][i]) ^ finiteFieldMultiplication(b03, data[3][i]));
             column[3] = (finiteFieldMultiplication(b03, data[0][i]) ^ data[1][i]
-                                ^ data[2][i]  ^ finiteFieldMultiplication(b02, data[3][i]));
+                    ^ data[2][i]  ^ finiteFieldMultiplication(b02, data[3][i]));
             for (int j = 0; j < nb; j++) {
                 state[j][i] = (byte) column[j];
             }
@@ -143,6 +194,7 @@ public class AES implements Cipher {
     }
 
     public byte[][] addRoundKey(byte[][] data, int round) {
+        //dodanie XOR wszytskich bajtow macierzy do bajtow podklucza wlasciwego
         byte[][] modifiedTable = new byte[nb][nb];
         byte[][] keySchedule = expandKey();
         for (int i = 0; i < nb; i++) {
@@ -218,9 +270,9 @@ public class AES implements Cipher {
             byte[] temp = new byte[] {
                     extendedKey[0][i - 1], extendedKey[1][i - 1], extendedKey[2][i - 1], extendedKey[3][i - 1]};
             if (i % nk == 0) {
-                    temp = wordOperation(temp, i);
+                temp = wordOperation(temp, i);
             } else if (nk > 6 & i % nk == 4) {
-                    temp = subWord(temp);
+                temp = subWord(temp);
             }
             for (int j = 0; j < nb; j++) {
                 extendedKey[j][i] = (byte) (extendedKey[j][i - nk] ^ temp[j]);
@@ -286,12 +338,13 @@ public class AES implements Cipher {
         return state;
     }
 
-    private void generateKey() {
+    public void generateKey() {
         BigInteger generatedKey = new BigInteger(nk * 32, new Random());
         setKey(generatedKey.toByteArray());
     }
 
     private byte substitutedByte(byte b) {
+        //uzyskanie indeksow, aby z tablicy SBOX wybrac odpowiednie wartosci; higherbits to 4 starsze bity, lowerbits to 4 mlodsze bity z danej wejsciowej b
         byte higherBits = (byte) ((byte) (b >> 4) & 0x0f);
         byte lowerBits = (byte) (b & 0x0f);
         return (byte) sBox[higherBits][lowerBits];

@@ -235,115 +235,115 @@ public class AESTest {
                 (byte)0x6e, (byte)0xaf, (byte)0x70, (byte)0xa0,
                 (byte)0xec, (byte)0x0d, (byte)0x71, (byte)0x91};
         Assert.assertArrayEquals(expected, aes.encipher(input));
-        }
-
-        @Test
-        public void decipher192bitTest() {
-            byte[] testkey = new byte[] {
-                    (byte)0x00, (byte)0x01, (byte)0x02, (byte)0x03,
-                    (byte)0x04, (byte)0x05, (byte)0x06, (byte)0x07,
-                    (byte)0x08, (byte)0x09, (byte)0x0a, (byte)0x0b,
-                    (byte)0x0c, (byte)0x0d, (byte)0x0e, (byte)0x0f,
-                    (byte)0x10, (byte)0x11, (byte)0x12, (byte)0x13,
-                    (byte)0x14, (byte)0x15, (byte)0x16, (byte)0x17};
-            AES aes = new AES(192, testkey);
-            byte[] input = new byte[] {
-                    (byte)0xdd, (byte)0xa9, (byte)0x7c, (byte)0xa4,
-                    (byte)0x86, (byte)0x4c, (byte)0xdf, (byte)0xe0,
-                    (byte)0x6e, (byte)0xaf, (byte)0x70, (byte)0xa0,
-                    (byte)0xec, (byte)0x0d, (byte)0x71, (byte)0x91};
-            byte [] expected = new byte[] {
-                    (byte)0x00, (byte)0x11, (byte)0x22, (byte)0x33,
-                    (byte)0x44, (byte)0x55, (byte)0x66, (byte)0x77,
-                    (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb,
-                    (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff};
-            Assert.assertArrayEquals(expected, aes.decipher(input));
-        }
-
-        @Test
-        public void encipher256bitTest() {
-            byte [] input = new byte[] {
-                    (byte)0x00, (byte)0x11, (byte)0x22, (byte)0x33,
-                    (byte)0x44, (byte)0x55, (byte)0x66, (byte)0x77,
-                    (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb,
-                    (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff};
-            byte[] testkey = new byte[] {
-                    (byte)0x00, (byte)0x01, (byte)0x02, (byte)0x03,
-                    (byte)0x04, (byte)0x05, (byte)0x06, (byte)0x07,
-                    (byte)0x08, (byte)0x09, (byte)0x0a, (byte)0x0b,
-                    (byte)0x0c, (byte)0x0d, (byte)0x0e, (byte)0x0f,
-                    (byte)0x10, (byte)0x11, (byte)0x12, (byte)0x13,
-                    (byte)0x14, (byte)0x15, (byte)0x16, (byte)0x17,
-                    (byte)0x18, (byte)0x19, (byte)0x1a, (byte)0x1b,
-                    (byte)0x1c, (byte)0x1d, (byte)0x1e, (byte)0x1f};
-            AES aes = new AES(256, testkey);
-            byte[] expected = new byte[] {
-                    (byte)0x8e, (byte)0xa2, (byte)0xb7, (byte)0xca,
-                    (byte)0x51, (byte)0x67, (byte)0x45, (byte)0xbf,
-                    (byte)0xea, (byte)0xfc, (byte)0x49, (byte)0x90,
-                    (byte)0x4b, (byte)0x49, (byte)0x60, (byte)0x89};
-            Assert.assertArrayEquals(expected, aes.encipher(input));
-            Assert.assertArrayEquals(input, aes.decipher(expected));
-        }
-
-        @Test
-        public void decipher256bitTest() {
-            byte[] testkey = new byte[] {
-                    (byte)0x00, (byte)0x01, (byte)0x02, (byte)0x03,
-                    (byte)0x04, (byte)0x05, (byte)0x06, (byte)0x07,
-                    (byte)0x08, (byte)0x09, (byte)0x0a, (byte)0x0b,
-                    (byte)0x0c, (byte)0x0d, (byte)0x0e, (byte)0x0f,
-                    (byte)0x10, (byte)0x11, (byte)0x12, (byte)0x13,
-                    (byte)0x14, (byte)0x15, (byte)0x16, (byte)0x17,
-                    (byte)0x18, (byte)0x19, (byte)0x1a, (byte)0x1b,
-                    (byte)0x1c, (byte)0x1d, (byte)0x1e, (byte)0x1f};
-            AES aes = new AES(256, testkey);
-            byte[] input = new byte[] {
-                    (byte)0x8e, (byte)0xa2, (byte)0xb7, (byte)0xca,
-                    (byte)0x51, (byte)0x67, (byte)0x45, (byte)0xbf,
-                    (byte)0xea, (byte)0xfc, (byte)0x49, (byte)0x90,
-                    (byte)0x4b, (byte)0x49, (byte)0x60, (byte)0x89};
-            byte [] expected = new byte[] {
-                    (byte)0x00, (byte)0x11, (byte)0x22, (byte)0x33,
-                    (byte)0x44, (byte)0x55, (byte)0x66, (byte)0x77,
-                    (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb,
-                    (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff};
-            Assert.assertArrayEquals(expected, aes.decipher(input));
-        }
-
-        @Test
-        public void invSubBytesTest() {
-            AES aes = new AES(128);
-            byte[][] test = {
-                    {(byte) 0x7a, (byte) 0x89, (byte) 0x2b, (byte) 0x3d},
-                    {(byte) 0x9f, (byte) 0xd5, (byte) 0xef, (byte) 0xca},
-                    {(byte) 0x10, (byte) 0xf5, (byte) 0xfd, (byte) 0x4e},
-                    {(byte) 0x27, (byte) 0x0b, (byte) 0x9f, (byte) 0xa7}};
-            byte[][] expected = {
-                    {(byte) 0xbd, (byte) 0xf2, (byte) 0x0b, (byte) 0x8b},
-                    {(byte) 0x6e, (byte) 0xb5, (byte) 0x61, (byte) 0x10},
-                    {(byte) 0x7c, (byte) 0x77, (byte) 0x21, (byte) 0xb6},
-                    {(byte) 0x3d, (byte) 0x9e, (byte) 0x6e, (byte) 0x89}};
-            Assert.assertArrayEquals(expected, aes.invSubBytes(test));
-        }
-
-        @Test
-        public void invShiftRowsTest() {
-            AES aes = new AES(128);
-            byte[][] test = {
-                    {(byte) 0x7a, (byte) 0x89, (byte) 0x2b, (byte) 0x3d},
-                    {(byte) 0xd5, (byte) 0xef, (byte) 0xca, (byte) 0x9f},
-                    {(byte) 0xfd, (byte) 0x4e, (byte) 0x10, (byte) 0xf5},
-                    {(byte) 0xa7, (byte) 0x27, (byte) 0x0b, (byte) 0x9f}};
-            byte[][] expected = {
-                    {(byte) 0x7a, (byte) 0x89, (byte) 0x2b, (byte) 0x3d},
-                    {(byte) 0x9f, (byte) 0xd5, (byte) 0xef, (byte) 0xca},
-                    {(byte) 0x10, (byte) 0xf5, (byte) 0xfd, (byte) 0x4e},
-                    {(byte) 0x27, (byte) 0x0b, (byte) 0x9f, (byte) 0xa7}};
-            Assert.assertArrayEquals(expected, aes.invShiftRows(test));
-        }
-
     }
+
+    @Test
+    public void decipher192bitTest() {
+        byte[] testkey = new byte[] {
+                (byte)0x00, (byte)0x01, (byte)0x02, (byte)0x03,
+                (byte)0x04, (byte)0x05, (byte)0x06, (byte)0x07,
+                (byte)0x08, (byte)0x09, (byte)0x0a, (byte)0x0b,
+                (byte)0x0c, (byte)0x0d, (byte)0x0e, (byte)0x0f,
+                (byte)0x10, (byte)0x11, (byte)0x12, (byte)0x13,
+                (byte)0x14, (byte)0x15, (byte)0x16, (byte)0x17};
+        AES aes = new AES(192, testkey);
+        byte[] input = new byte[] {
+                (byte)0xdd, (byte)0xa9, (byte)0x7c, (byte)0xa4,
+                (byte)0x86, (byte)0x4c, (byte)0xdf, (byte)0xe0,
+                (byte)0x6e, (byte)0xaf, (byte)0x70, (byte)0xa0,
+                (byte)0xec, (byte)0x0d, (byte)0x71, (byte)0x91};
+        byte [] expected = new byte[] {
+                (byte)0x00, (byte)0x11, (byte)0x22, (byte)0x33,
+                (byte)0x44, (byte)0x55, (byte)0x66, (byte)0x77,
+                (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb,
+                (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff};
+        Assert.assertArrayEquals(expected, aes.decipher(input));
+    }
+
+    @Test
+    public void encipher256bitTest() {
+        byte [] input = new byte[] {
+                (byte)0x00, (byte)0x11, (byte)0x22, (byte)0x33,
+                (byte)0x44, (byte)0x55, (byte)0x66, (byte)0x77,
+                (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb,
+                (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff};
+        byte[] testkey = new byte[] {
+                (byte)0x00, (byte)0x01, (byte)0x02, (byte)0x03,
+                (byte)0x04, (byte)0x05, (byte)0x06, (byte)0x07,
+                (byte)0x08, (byte)0x09, (byte)0x0a, (byte)0x0b,
+                (byte)0x0c, (byte)0x0d, (byte)0x0e, (byte)0x0f,
+                (byte)0x10, (byte)0x11, (byte)0x12, (byte)0x13,
+                (byte)0x14, (byte)0x15, (byte)0x16, (byte)0x17,
+                (byte)0x18, (byte)0x19, (byte)0x1a, (byte)0x1b,
+                (byte)0x1c, (byte)0x1d, (byte)0x1e, (byte)0x1f};
+        AES aes = new AES(256, testkey);
+        byte[] expected = new byte[] {
+                (byte)0x8e, (byte)0xa2, (byte)0xb7, (byte)0xca,
+                (byte)0x51, (byte)0x67, (byte)0x45, (byte)0xbf,
+                (byte)0xea, (byte)0xfc, (byte)0x49, (byte)0x90,
+                (byte)0x4b, (byte)0x49, (byte)0x60, (byte)0x89};
+        Assert.assertArrayEquals(expected, aes.encipher(input));
+        Assert.assertArrayEquals(input, aes.decipher(expected));
+    }
+
+    @Test
+    public void decipher256bitTest() {
+        byte[] testkey = new byte[] {
+                (byte)0x00, (byte)0x01, (byte)0x02, (byte)0x03,
+                (byte)0x04, (byte)0x05, (byte)0x06, (byte)0x07,
+                (byte)0x08, (byte)0x09, (byte)0x0a, (byte)0x0b,
+                (byte)0x0c, (byte)0x0d, (byte)0x0e, (byte)0x0f,
+                (byte)0x10, (byte)0x11, (byte)0x12, (byte)0x13,
+                (byte)0x14, (byte)0x15, (byte)0x16, (byte)0x17,
+                (byte)0x18, (byte)0x19, (byte)0x1a, (byte)0x1b,
+                (byte)0x1c, (byte)0x1d, (byte)0x1e, (byte)0x1f};
+        AES aes = new AES(256, testkey);
+        byte[] input = new byte[] {
+                (byte)0x8e, (byte)0xa2, (byte)0xb7, (byte)0xca,
+                (byte)0x51, (byte)0x67, (byte)0x45, (byte)0xbf,
+                (byte)0xea, (byte)0xfc, (byte)0x49, (byte)0x90,
+                (byte)0x4b, (byte)0x49, (byte)0x60, (byte)0x89};
+        byte [] expected = new byte[] {
+                (byte)0x00, (byte)0x11, (byte)0x22, (byte)0x33,
+                (byte)0x44, (byte)0x55, (byte)0x66, (byte)0x77,
+                (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb,
+                (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff};
+        Assert.assertArrayEquals(expected, aes.decipher(input));
+    }
+
+    @Test
+    public void invSubBytesTest() {
+        AES aes = new AES(128);
+        byte[][] test = {
+                {(byte) 0x7a, (byte) 0x89, (byte) 0x2b, (byte) 0x3d},
+                {(byte) 0x9f, (byte) 0xd5, (byte) 0xef, (byte) 0xca},
+                {(byte) 0x10, (byte) 0xf5, (byte) 0xfd, (byte) 0x4e},
+                {(byte) 0x27, (byte) 0x0b, (byte) 0x9f, (byte) 0xa7}};
+        byte[][] expected = {
+                {(byte) 0xbd, (byte) 0xf2, (byte) 0x0b, (byte) 0x8b},
+                {(byte) 0x6e, (byte) 0xb5, (byte) 0x61, (byte) 0x10},
+                {(byte) 0x7c, (byte) 0x77, (byte) 0x21, (byte) 0xb6},
+                {(byte) 0x3d, (byte) 0x9e, (byte) 0x6e, (byte) 0x89}};
+        Assert.assertArrayEquals(expected, aes.invSubBytes(test));
+    }
+
+    @Test
+    public void invShiftRowsTest() {
+        AES aes = new AES(128);
+        byte[][] test = {
+                {(byte) 0x7a, (byte) 0x89, (byte) 0x2b, (byte) 0x3d},
+                {(byte) 0xd5, (byte) 0xef, (byte) 0xca, (byte) 0x9f},
+                {(byte) 0xfd, (byte) 0x4e, (byte) 0x10, (byte) 0xf5},
+                {(byte) 0xa7, (byte) 0x27, (byte) 0x0b, (byte) 0x9f}};
+        byte[][] expected = {
+                {(byte) 0x7a, (byte) 0x89, (byte) 0x2b, (byte) 0x3d},
+                {(byte) 0x9f, (byte) 0xd5, (byte) 0xef, (byte) 0xca},
+                {(byte) 0x10, (byte) 0xf5, (byte) 0xfd, (byte) 0x4e},
+                {(byte) 0x27, (byte) 0x0b, (byte) 0x9f, (byte) 0xa7}};
+        Assert.assertArrayEquals(expected, aes.invShiftRows(test));
+    }
+
+}
 
 
 
