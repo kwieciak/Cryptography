@@ -3,12 +3,15 @@ package org.example;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -21,18 +24,12 @@ import java.util.Scanner;
 public class AESController implements Initializable {
 
     private FileChooser fileChooser = new FileChooser();
-    private int keyLength;
+    private int keyLength = 0;
 
     private AES aes = new AES(keyLength);
 
     @FXML
     private TextArea keyInput;
-
-    @FXML
-    private TextField keyFromFile;
-
-    @FXML
-    private TextField keyToSave;
 
     @FXML
     private TextArea unecryptedText;
@@ -43,16 +40,18 @@ public class AESController implements Initializable {
     @FXML
     private ChoiceBox<Integer> keyLengthChoice;
 
-    @FXML
-    private TextArea unecryptedFile;
-
 
     private Integer[] keyLengths = {128, 192, 256};
+
+    private byte[] fileContent;
+    //String path;
+    boolean isFileloaded = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         keyLengthChoice.getItems().addAll(keyLengths);
         keyLengthChoice.setOnAction(this::getKeyLength);
+        ecryptedText.setEditable(false);
     }
 
     private void getKeyLength(javafx.event.ActionEvent actionEvent) {
@@ -60,148 +59,90 @@ public class AESController implements Initializable {
     }
 
     @FXML
-    protected void keyGenerator(){
+    protected void keyGenerator() {
+        if (this.keyLength == 0) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("The key length has been not selected");
+            alert.show();
+        }
         aes = new AES(keyLength);
         aes.generateKey();
-        byte [] key = aes.getKey();
+        byte[] key = aes.getKey();
         StringBuilder str = new StringBuilder(new String());
-        for(int i = 0; i<keyLength/8; i++){
-            str.append((char)key[i]);
+        for (int i = 0; i < keyLength / 8; i++) {
+            str.append((char) key[i]);
         }
         keyInput.setText(str.toString());
     }
 
+
     @FXML
-    protected void encryptButton(){
-        if(unecryptedText != null) {
-            byte[] text = unecryptedText.getText().getBytes();
-            text = aes.encode(text);
-            byte[] result = Base64.getEncoder().encode(text);
-            String str = new String(result);
-            ecryptedText.setText(str);
-        }
-        else if(fileContent != null){
-            fileContent = aes.encode(fileContent);
+    protected void loadFile(ActionEvent event) throws IOException {
+        File file = fileChooser.showOpenDialog(new Stage());
+        if (file != null) {
+            String path = file.getPath();
+            fileContent = Files.readAllBytes(Paths.get(path));
+            isFileloaded = true;
         }
     }
 
     @FXML
-    protected void unecryptButton(){
-        if(ecryptedText != null ) {
-            byte[] text = ecryptedText.getText().getBytes();
-            byte[] result = Base64.getDecoder().decode(text);
-            result = aes.decode(result);
+    protected void encryptButton() throws Exception {
+        if (isFileloaded == true) {
+            fileContent = aes.encode(fileContent);
+        } else if (unecryptedText != null) {
+            fileContent = unecryptedText.getText().getBytes();
+            fileContent = aes.encode(fileContent);
+            byte[] result = Base64.getEncoder().encode(fileContent);
             String str = new String(result);
-            unecryptedText.setText(str);
+            ecryptedText.setText(str);
         }
-        else if(fileContent != null){
+    }
+
+    @FXML
+    protected void unecryptButton() {
+        if (isFileloaded == true) {
             fileContent = aes.decode(fileContent);
         }
     }
 
-    @FXML
-    protected void loadKeyFromFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(new Stage());
-        try {
-            Scanner scanner = new Scanner(file);
-            while(scanner.hasNext()) {
-                keyFromFile.appendText(scanner.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        aes.setKey(keyFromFile.getText().getBytes());
-    }
-
-    private byte[] fileContent;
-    String path;
 
     @FXML
-    protected void loadUnecryptedAndEcryptedFile(ActionEvent event) throws IOException {
-        File file = fileChooser.showOpenDialog(new Stage());
-        if(file != null){
-            path = file.getPath();
-            fileContent = Files.readAllBytes(Paths.get(path));
-        }
-    }
-
-    // @FXML
-    // protected void saveUnecryptedAndEcryptedFile(ActionEvent){
-    // FileOutputStream fileOutputStream = new FileOutputStream(fileContent);
-    // }
-
-    @FXML
-    protected void loadUnecryptedText(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(new Stage());
-        try {
-            Scanner scanner = new Scanner(file);
-            while(scanner.hasNext()) {
-                unecryptedText.appendText(scanner.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @FXML
-    protected void loadEcryptedText(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(new Stage());
-        try {
-            Scanner scanner = new Scanner(file);
-            while(scanner.hasNext()) {
-                ecryptedText.appendText(scanner.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @FXML
-    protected void saveEcrptedText(ActionEvent event) {
+    protected void saveFile(ActionEvent event) throws IOException {
         File file = fileChooser.showSaveDialog(new Stage());
         if (file != null) {
-            try {
-                PrintWriter printWriter = new PrintWriter(file);
-                printWriter.write(ecryptedText.getText());
-                printWriter.close();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            String path = file.getPath();
+            OutputStream outputStream = new FileOutputStream(path);
+            outputStream.write(fileContent, 0, fileContent.length);
+            outputStream.close();
+            fileContent = null;
+            isFileloaded = false;
+            unecryptedText.setText(null);
+            ecryptedText.setText(null);
         }
     }
 
     @FXML
-    protected void saveUnecrpytedText(ActionEvent event) {
+    protected void saveKey(ActionEvent event) throws IOException {
         File file = fileChooser.showSaveDialog(new Stage());
         if (file != null) {
-            try {
-                PrintWriter printWriter = new PrintWriter(file);
-                printWriter.write(unecryptedText.getText());
-                printWriter.close();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+                String path = file.getPath();
+                OutputStream outputStream = new FileOutputStream(path);
+                outputStream.write(keyInput.getText().getBytes(), 0, keyInput.getText().getBytes().length);
+                outputStream.close();
         }
     }
 
-    @FXML
-    protected void saveKey(ActionEvent event) {
-        File file = fileChooser.showSaveDialog(new Stage());
+  /*  @FXML
+    protected void loadKey(ActionEvent event) throws IOException {
+        File file = fileChooser.showOpenDialog(new Stage());
         if (file != null) {
-            try {
-                PrintWriter printWriter = new PrintWriter(file);
-                printWriter.write(keyToSave.getText());
-                printWriter.close();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            String path = file.getPath();
+            byte[] keyHelper = Files.readAllBytes(Paths.get(path));
+            aes.setKey(keyHelper);
+            byte[] result = Base64.getEncoder().encode(keyHelper);
+            String str = new String(result);
+            keyInput.setText(str);
         }
-    }
-    private String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
-    }
+    } */
 }

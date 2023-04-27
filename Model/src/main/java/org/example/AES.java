@@ -70,7 +70,10 @@ public class AES implements Cipher {
         return tmp;
     }
 
-    public byte[] encode (byte [] data){
+    public byte[] encode (byte [] data) throws Exception {
+        if (data.length == 0) {
+            throw new Exception("Nie podano danych do odszyfrowania.");
+        }
         int full16BytesBlocks = data.length / 16;
         if(data.length % 16 !=0 ){
             full16BytesBlocks++;
